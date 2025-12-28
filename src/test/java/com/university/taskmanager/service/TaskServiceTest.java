@@ -1,6 +1,5 @@
 package com.university.taskmanager.service;
 
-import com.university.taskmanager.service.TaskService;
 import com.university.taskmanager.model.Task;
 import com.university.taskmanager.repository.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
