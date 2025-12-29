@@ -31,10 +31,6 @@ jobs:
       - name: Run tests
         run: mvn clean test
 
-      - name: Generate test report
-        if: always()
-        run: mvn surefire-report:report
-
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -68,7 +64,7 @@ jobs:
           name: coverage-report
           path: target/site/jacoco/
 
-  # Job 3: Code Quality - Checkstyle
+  # Job 3: Code Quality - Checkstyle & SpotBugs
   code-quality:
     name: Code Quality
     runs-on: ubuntu-latest
@@ -119,7 +115,7 @@ jobs:
           name: application-jar
           path: target/*.jar
 
-  # Job 5: Build Docker Image
+  # Job 5: Build and Push Docker Image
   docker-build:
     name: Build Docker Image
     runs-on: ubuntu-latest
@@ -136,34 +132,53 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build application
+      - name: Build application JAR
         run: mvn clean package -DskipTests
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract metadata
+      - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE }}
           tags: |
             type=ref,event=branch
-            type=sha,prefix={{branch}}-
+            type=sha,prefix=main-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: ${{ github.ref == 'refs/heads/main' }}
+          load: true
+          tags: ${{ env.DOCKER_IMAGE }}:local
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Save Docker image
+        run: docker save ${{ env.DOCKER_IMAGE }}:local | gzip > docker-image.tar.gz
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: docker-image.tar.gz
+
+      - name: Push to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
@@ -174,40 +189,85 @@ jobs:
     name: Security Vulnerability Scan
     runs-on: ubuntu-latest
     needs: docker-build
-    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      - name: Download Docker image
+        uses: actions/download-artifact@v4
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          name: docker-image
+
+      - name: Load Docker image
+        run: |
+          docker load < docker-image.tar.gz
+          docker tag ${{ env.DOCKER_IMAGE }}:local ${{ env.DOCKER_IMAGE }}:scan
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
+          image-ref: ${{ env.DOCKER_IMAGE }}:scan
           format: 'table'
           exit-code: '0'
           severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
 
+      - name: Run Trivy vulnerability scanner (JSON output)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.DOCKER_IMAGE }}:scan
+          format: 'json'
+          output: 'trivy-results.json'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
 
-  # Job 7: Deploy Notification
-  deploy-notification:
+      - name: Upload Trivy scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-scan-results
+          path: trivy-results.json
+
+  # Job 7: Deployment Status Summary
+  deploy-status:
     name: Deployment Status
     runs-on: ubuntu-latest
-    needs: [docker-build, security-scan]
-    if: always() && github.ref == 'refs/heads/main'
+    needs: [test, coverage, code-quality, build, docker-build, security-scan]
+    if: always()
 
     steps:
-      - name: Deployment Summary
+      - name: Check test results
         run: |
-          echo "🚀 Pipeline Status Summary"
-          echo "=========================="
-          echo "Docker Build: ${{ needs.docker-build.result }}"
-          echo "Security Scan: ${{ needs.security-scan.result }}"
-          echo "Image Tag: ${{ github.sha }}"
-          echo "Branch: ${{ github.ref_name }}"
+          echo "🧪 Tests: ${{ needs.test.result }}"
+          echo "📊 Coverage: ${{ needs.coverage.result }}"
+          echo "✨ Code Quality: ${{ needs.code-quality.result }}"
+          echo "🔨 Build: ${{ needs.build.result }}"
+          echo "🐳 Docker: ${{ needs.docker-build.result }}"
+          echo "🔒 Security: ${{ needs.security-scan.result }}"
+
+      - name: Deployment summary
+        run: |
+          echo "### 🚀 Pipeline Status Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage | ${{ needs.coverage.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Quality | ${{ needs.code-quality.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker | ${{ needs.docker-build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "**Docker Image:** \`${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if any job failed
+        if: |
+          needs.test.result == 'failure' ||
+          needs.build.result == 'failure' ||
+          needs.docker-build.result == 'failure'
+        run: exit 1
