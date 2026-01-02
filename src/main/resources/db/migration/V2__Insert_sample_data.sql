@@ -1,0 +1,32 @@
+INSERT INTO tasks (title, description, status, priority, due_date, created_at, updated_at) VALUES
+    ('Setup Development Environment',
+     'Install all necessary tools including Java, Maven, Docker, and Kubernetes',
+     'COMPLETED',
+     'HIGH',
+     CURRENT_TIMESTAMP - INTERVAL '5 days',
+     CURRENT_TIMESTAMP - INTERVAL '10 days',
+     CURRENT_TIMESTAMP - INTERVAL '5 days'),
+
+    ('Implement CI/CD Pipeline',
+     'Configure GitHub Actions for automated testing, building, and deployment',
+     'COMPLETED',
+     'HIGH',
+     CURRENT_TIMESTAMP - INTERVAL '3 days',
+     CURRENT_TIMESTAMP - INTERVAL '7 days',
+     CURRENT_TIMESTAMP - INTERVAL '3 days'),
+
+    ('Create Kubernetes Manifests',
+     'Write deployment, service, and ingress configurations for K8s',
+     'IN_PROGRESS',
+     'HIGH',
+     CURRENT_TIMESTAMP + INTERVAL '1 day',
+     CURRENT_TIMESTAMP - INTERVAL '2 days',
+     CURRENT_TIMESTAMP),
+
+    ('Setup Database Migrations',
+     'Configure Flyway and create initial migration scripts',
+     'IN_PROGRESS',
+     'MEDIUM',
+     CURRENT_TIMESTAMP + INTERVAL '1 day',
+     CURRENT_TIMESTAMP - INTERVAL '1 day',
+     CURRENT_TIMESTAMP);
