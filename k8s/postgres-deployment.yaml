@@ -17,52 +17,20 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:15-alpine
+          image: postgres:15
           ports:
             - containerPort: 5432
-              name: postgres
           env:
-            - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: taskmanager-secret
-                  key: POSTGRES_DB
             - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: taskmanager-secret
-                  key: POSTGRES_USER
+              value: "postgres"
             - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: taskmanager-secret
-                  key: POSTGRES_PASSWORD
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
+              value: "password"
+            - name: POSTGRES_DB
+              value: "taskmanager"
           volumeMounts:
-            - name: postgres-storage
-              mountPath: /var/lib/postgresql/data
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-storage
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
             claimName: postgres-pvc
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pvc
-  namespace: taskmanager
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
