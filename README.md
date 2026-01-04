@@ -390,18 +390,6 @@ Repository Layer:  7 tests  (70% coverage)
 Total:            21 tests  (75% coverage)
 ```
 
-### Test Structure
-```
-src/test/java/
-└── com/university/taskmanager/
-    ├── controller/
-    │   └── TaskControllerTest.java
-    ├── service/
-    │   └── TaskServiceTest.java
-    └── repository/
-        └── TaskRepositoryTest.java
-```
-
 ### Technologies
 
 - **JUnit 5** - Test framework
@@ -435,22 +423,6 @@ src/test/java/
 - Checkstyle
 - SpotBugs
 - Trivy
-
----
-
-## 📈 Project Metrics
-
-| Metric | Value |
-|--------|-------|
-| Lines of Code | ~800 |
-| Test Coverage | 75% |
-| Unit Tests | 21 |
-| CI/CD Jobs | 8 |
-| Pipeline Time | 19 min |
-| Docker Image Size | 220 MB |
-| Security Vulnerabilities | 0 Critical, 2 High |
-| Code Smells | 3 Minor |
-| Technical Debt | 30 min |
 
 ---
 
