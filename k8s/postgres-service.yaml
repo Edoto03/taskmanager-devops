@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-service  # Must match the initContainer and ConfigMap
+  name: postgres-service
   namespace: taskmanager
 spec:
   selector:
-    app: postgres # Must match the label in your Postgres Deployment
+    app: postgres
   ports:
     - port: 5432
       targetPort: 5432

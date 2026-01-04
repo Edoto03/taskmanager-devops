@@ -1,4 +1,3 @@
--- V2: Insert sample data
 INSERT INTO tasks (title, description, status, created_at, updated_at) VALUES
 ('Setup Development Environment', 'Install Java 21, Maven, Docker, and Kubernetes', 'COMPLETED', NOW() - INTERVAL '7 days', NOW() - INTERVAL '6 days'),
 ('Create Spring Boot Application', 'Initialize project with dependencies', 'COMPLETED', NOW() - INTERVAL '6 days', NOW() - INTERVAL '5 days'),

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: taskmanager
 spec:
-  replicas: 1  # Let's use 1 pod until it works
+  replicas: 1
   selector:
     matchLabels:
       app: taskmanager
