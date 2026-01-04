@@ -6,7 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # --- ADD THIS PERMISSIONS BLOCK ---
     permissions:
       security-events: write
       actions: read
@@ -28,7 +27,6 @@ jobs:
           key: ${{ runner.os }}-sonar
       - name: Build and analyze
         env:
-          # --- ADD THIS LINE ---
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # ---------------------
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
