@@ -1,110 +1,277 @@
-# Task Manager - DevOps Final Project 🚀
+# Task Manager - DevOps Project
 
-Complete CI/CD pipeline with automated testing, security scanning, Docker, Kubernetes, and SonarQube code analysis.
+A Spring Boot REST API demonstrating complete DevOps automation with CI/CD, security scanning, containerization, and Kubernetes orchestration.
 
 [![CI/CD Pipeline](https://github.com/Edoto03/taskmanager-devops/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Edoto03/taskmanager-devops/actions)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Edoto03_taskmanager-devops&metric=alert_status)](https://sonarcloud.io/dashboard?id=Edoto03_taskmanager-devops)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Edoto03_taskmanager-devops&metric=alert_status)](https://sonarcloud.io/dashboard?id=Edoto03_taskmanager-devops)
 
 ---
 
-## 📋 Project Overview
+## Application Overview
 
-A Spring Boot REST API for task management demonstrating enterprise-grade DevOps practices from development to production deployment.
-
-### Key Features
-- RESTful CRUD API for task management
-- PostgreSQL database with automated migrations
-- 21 comprehensive unit tests (75% coverage)
-- Multi-stage CI/CD pipeline with 8 automated jobs
-- Container security scanning
-- Code quality analysis with SonarQube
-- Kubernetes orchestration with auto-scaling
+A lightweight task management REST API built with Spring Boot. The application provides CRUD operations for managing tasks with PostgreSQL persistence. The focus is on demonstrating enterprise DevOps practices rather than complex business logic.
 
 ---
 
-## ✅ DevOps Topics Covered (10/10)
-
-| # | Topic | Implementation | Status |
-|---|-------|----------------|--------|
-| 1 | **Source Control** | Git/GitHub with protected branches | ✅ |
-| 2 | **Branching Strategies** | GitFlow (main/develop/feature) | ✅ |
-| 3 | **Building Pipelines** | GitHub Actions (8 automated jobs) | ✅ |
-| 4 | **Continuous Integration** | Automated testing + code quality | ✅ |
-| 5 | **Continuous Delivery** | Auto Docker build & registry push | ✅ |
-| 6 | **Security (SAST)** | Trivy + SpotBugs + SonarQube | ✅ |
-| 7 | **Docker** | Multi-stage builds + Docker Compose | ✅ |
-| 8 | **Kubernetes** | Deployments + Services + ConfigMaps | ✅ |
-| 9 | **Database Changes** | Flyway migrations (V1, V2) | ✅ |
-| 10 | **Infrastructure as Code** | Declarative K8s manifests | ✅ |
-
----
-
-## 🏗️ Architecture
+## Project Structure
 ```
-┌─────────────────────────────────────────────────────────┐
-│                  GitHub Repository                      │
-│                                                         │
-│  Developer commits → Pull Request → Code Review         │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│            GitHub Actions CI/CD Pipeline                │
-│                                                         │
-│  ┌──────────┐  ┌──────────┐  ┌───────────┐              │
-│  │  Tests   │→ │ Coverage │→ │ SonarQube │              │
-│  │ (21)     │  │ (JaCoCo) │  │ Analysis  │              │
-│  └──────────┘  └──────────┘  └───────────┘              │
-│        │                                                │
-│        ▼                                                │
-│  ┌──────────┐  ┌──────────┐  ┌───────────┐              │
-│  │  Code    │→ │  Build   │→ │   Docker  │              │
-│  │ Quality  │  │  (Maven) │  │   Build   │              │
-│  └──────────┘  └──────────┘  └─────┬─────┘              │
-│                                    │                    │
-│                                    ▼                    │
-│                              ┌──────────┐               │
-│                              │  Trivy   │               │
-│                              │ Security │               │
-│                              │  Scan    │               │
-│                              └────┬─────┘               │
-└───────────────────────────────────┼─────────────────────┘
-                                    │
-                                    ▼
-                         ┌──────────────────┐
-                         │   Docker Hub     │
-                         │ (Image Registry) │
-                         └────────┬─────────┘
-                                  │
-                                  ▼
-┌─────────────────────────────────────────────────────────┐
-│              Kubernetes Cluster                         │
-│                                                         │
-│  ┌────────────────┐         ┌──────────────────┐        │
-│  │   PostgreSQL   │◄────────┤  Task Manager    │        │
-│  │   (1 pod)      │         │  (1 pod)         │        │
-│  │   + Storage    │         │  + Auto-healing  │        │
-│  └────────────────┘         └──────────────────┘        │
-│         ▲                           ▲                   │
-│         │                           │                   │
-│    ┌────┴────┐                 ┌────┴────┐              │
-│    │ Service │                 │ Service │              │
-│    │ (5432)  │                 │ (30080) │              │
-│    └─────────┘                 └─────────┘              │
-└─────────────────────────────────────────────────────────┘
+taskmanager-devops/
+├── .github/
+│   └── workflows/
+│       ├── ci-cd.yml              # Main CI/CD pipeline
+│       └── sonar.yml              # SonarQube analysis
+├── k8s/
+│   ├── namespace.yaml             # Kubernetes namespace
+│   ├── configmap.yaml             # Application configuration
+│   ├── secret.yaml                # Database credentials
+│   ├── postgres-deployment.yaml   # PostgreSQL deployment
+│   ├── postgres-pvc.yaml          # Persistent volume claim
+│   ├── postgres-service.yaml      # PostgreSQL service
+│   ├── deployment.yaml            # Application deployment
+│   ├── service.yaml               # Application service (NodePort)
+│   └── ingress.yaml               # Ingress configuration
+├── src/
+│   ├── main/
+│   │   ├── java/com/university/taskmanager/
+│   │   │   ├── controller/
+│   │   │   │   └── TaskController.java
+│   │   │   ├── model/
+│   │   │   │   └── Task.java
+│   │   │   ├── repository/
+│   │   │   │   └── TaskRepository.java
+│   │   │   ├── service/
+│   │   │   │   └── TaskService.java
+│   │   │   └── TaskmanagerApplication.java
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── db/migration/
+│   │       │   ├── V1__Create_tasks_table.sql
+│   │       │   └── V2__Insert_sample_data.sql
+│   │       └── static/
+│   │           └── index.html
+│   └── test/
+│       ├── java/com/university/taskmanager/
+│       │   ├── controller/
+│       │   │   └── TaskControllerTest.java
+│       │   ├── service/
+│       │   │   └── TaskServiceTest.java
+│       │   └── TaskmanagerApplicationTests.java
+│       └── resources/
+│           └── application-test.properties
+├── Dockerfile
+├── docker-compose.yml
+├── pom.xml
+├── sonar-project.properties
+└── README.md
 ```
 
 ---
 
-## 🚀 Quick Start
+## DevOps Implementation
 
-### Prerequisites
-- Java 21
-- Maven 3.8+
-- Docker Desktop with Kubernetes
-- kubectl CLI
+This project demonstrates 10 core DevOps practices:
 
-### Local Development
+| Topic | Implementation | Status |
+|-------|----------------|--------|
+| Source Control | Git with GitHub | Complete |
+| Branching Strategy | GitFlow (main/develop/feature) | Complete |
+| Build Pipeline | GitHub Actions (9 automated jobs) | Complete |
+| Continuous Integration | Automated testing and quality gates | Complete |
+| Continuous Delivery | Automated Docker builds and registry push | Complete |
+| Security (SAST) | SonarQube, Trivy, Snyk, SpotBugs | Complete |
+| Containerization | Docker multi-stage builds | Complete |
+| Orchestration | Kubernetes deployments | Complete |
+| Database Migrations | Flyway version control | Complete |
+| Infrastructure as Code | Kubernetes manifests | Complete |
+
+---
+
+## Branching Strategy & Workflow
+
+The project follows a Structured GitFlow Strategy with protection rules to ensure code quality.
+
+**Branch Structure:**
+- `main` (Production): Stable branch deployed to Kubernetes. Protected: requires Pull Request approval.
+- `develop` (Integration): Staging branch where features are combined and tested. Protected: CI checks must pass.
+- `feature/**` (Development): Temporary branches for specific features.
+
+**Quality Gates:**
+- Required Status Checks: CI Pipeline must pass before merging.
+- Pull Request Flow: Direct commits are disabled to ensure code review.
+
+**Workflow Diagram:**
+```
+feature/add-api → develop → main → Kubernetes Production
+       ↓             ↓        ↓
+    Lint Check    Full CI   Deploy
+                  + Tests
+```
+
+---
+
+## CI/CD Pipeline
+
+The pipeline executes 9 automated jobs on every push to main or develop branches.
+
+**Pipeline Jobs:**
+
+1. **Run Tests** (~2 min): Executes 21 unit tests across all application layers.
+2. **Code Coverage** (~2 min): Generates JaCoCo coverage reports (75% coverage).
+3. **SonarQube Analysis** (~3 min): Performs SAST for code quality and security vulnerabilities.
+4. **Code Quality** (~2 min): Runs Checkstyle and SpotBugs for standards enforcement.
+5. **Snyk Scan** (~2 min): Scans Maven dependencies and Docker images for known vulnerabilities.
+6. **Build Application** (~3 min): Compiles source code and packages JAR artifact.
+7. **Build Docker Image** (~4 min): Multi-stage build and push to Docker Hub with versioned tags.
+8. **Security Scan** (~2 min): Trivy scans Docker image for CRITICAL and HIGH vulnerabilities.
+9. **Deployment Status** (~1 min): Summary of all job results.
+
+**Total Pipeline Duration:** ~20 minutes
+
+**Pipeline Efficiency:**
+- Path filtering ignores documentation changes (`**.md`) to prevent unnecessary builds.
+- Smart triggers reduce GitHub Actions compute usage.
+
+View live pipeline: [GitHub Actions](https://github.com/Edoto03/taskmanager-devops/actions)
+
+---
+
+## Security Implementation
+
+### Static Application Security Testing (SAST)
+
+**SonarQube**
+- **Purpose:** Code quality and security analysis
+- **Integration:** Runs on every commit
+- **Detects:** SQL injection, XSS vulnerabilities, code smells, technical debt
+- **Dashboard:** [SonarCloud](https://sonarcloud.io/dashboard?id=Edoto03_taskmanager-devops)
+
+**Trivy**
+- **Purpose:** Container vulnerability scanning
+- **Integration:** Scans every Docker image before deployment
+- **Detects:** OS package vulnerabilities, application dependency CVEs
+- **Database:** National Vulnerability Database (NVD)
+
+**Snyk**
+- **Purpose:** Dependency vulnerability scanning
+- **Integration:** Scans Maven dependencies and Docker base images
+- **Detects:** Known vulnerabilities in third-party libraries
+
+**SpotBugs**
+- **Purpose:** Java static code analysis
+- **Integration:** Runs during code quality job
+- **Detects:** Null pointer dereferences, resource leaks, SQL injection risks
+
+**Why SAST Matters:**
+- Early Detection: Identifies vulnerabilities during development
+- Cost Reduction: Fixes are 10x cheaper in development vs. production
+- Compliance: Meets industry standards (OWASP, PCI-DSS)
+
+---
+
+## Docker Configuration
+
+The application is containerized using Docker with security and performance optimizations.
+
+**Security Implementation:**
+- Minimal Base Image: Uses `eclipse-temurin:21-jre-jammy` to reduce attack surface.
+- Non-Root Execution: Application runs as dedicated user to prevent privilege escalation.
+- Multi-Stage Build: Separates build and runtime environments for smaller final image.
+
+**Build Performance:**
+- Layer Caching: Dependencies are installed before source code to leverage Docker caching.
+- Dependency Separation: `pom.xml` copied independently for optimal cache utilization.
+
+---
+
+## Kubernetes Deployment
+
+The application runs on a Kubernetes cluster with high availability and self-healing capabilities.
+
+**Resources Deployed:**
+```yaml
+Namespace: taskmanager
+Deployments: postgres (1 replica), taskmanager (1 replica)
+Services: postgres-service (ClusterIP), taskmanager-service (NodePort:30080)
+ConfigMaps: taskmanager-config (environment variables)
+Secrets: taskmanager-secret (database credentials)
+Storage: postgres-pvc (1Gi persistent volume)
+```
+
+**Key Features:**
+- Self-Healing: Automatic pod restart on failure
+- Rolling Updates: Zero-downtime deployments
+- Resource Limits: CPU and memory constraints
+- Health Probes: Liveness and readiness checks
+- Init Containers: Database dependency management
+- Persistent Storage: Database survives pod restarts
+
+**Management Commands:**
+```bash
+# Deploy all resources
+kubectl apply -f k8s/
+
+# Verify deployment
+kubectl get pods -n taskmanager
+
+# View logs
+kubectl logs -f deployment/taskmanager -n taskmanager
+
+# Access application
+curl http://localhost:30080/api/tasks
+```
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tasks` | Retrieve all tasks |
+| GET | `/api/tasks/{id}` | Retrieve specific task |
+| POST | `/api/tasks` | Create new task |
+| PUT | `/api/tasks/{id}` | Update existing task |
+| DELETE | `/api/tasks/{id}` | Delete task |
+
+**Example Request:**
+```bash
+# Create task
+curl -X POST http://localhost:30080/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Complete DevOps project",
+    "description": "Finish all 10 topics",
+    "status": "IN_PROGRESS"
+  }'
+
+# Get all tasks
+curl http://localhost:30080/api/tasks
+```
+
+---
+
+## Database Schema
+```sql
+CREATE TABLE tasks (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**Migration History:**
+- V1: Create tasks table with indexes
+- V2: Insert sample data (8 tasks)
+
+Migrations are managed by Flyway and execute automatically on application startup.
+
+---
+
+## How to Run
+
+### 1. Running from Source
 ```bash
 # Clone repository
 git clone https://github.com/Edoto03/taskmanager-devops.git
@@ -120,356 +287,48 @@ mvn spring-boot:run
 curl http://localhost:8080/api/tasks
 ```
 
-### Run Tests
+### 2. Local Testing (Docker)
 ```bash
-# All tests
-mvn clean test
+# Build Docker image
+docker build -t taskmanager .
 
-# With coverage
-mvn test jacoco:report
-open target/site/jacoco/index.html
+# Run container
+docker run -p 8080:8080 taskmanager
+
+# Access at http://localhost:8080
 ```
 
-### Deploy to Kubernetes
+### 3. Kubernetes Deployment
 ```bash
-# Deploy everything
+# Create namespace and deploy resources
 kubectl apply -f k8s/
 
-# Verify
+# Verify deployment
 kubectl get pods -n taskmanager
 
-# Access API
+# Access application
 curl http://localhost:30080/api/tasks
 ```
 
 ---
 
-## 📊 CI/CD Pipeline (8 Jobs)
+## Technologies Used
 
-### Pipeline Jobs
-
-1. **Run Tests** (2 min)
-   - Executes 21 unit tests
-   - Validates all layers (Controller, Service, Repository)
-   - Fails pipeline if any test fails
-
-2. **Code Coverage** (2 min)
-   - Generates JaCoCo coverage report
-   - Current coverage: **75%**
-   - Uploads report as artifact
-
-3. **SonarQube Analysis** (3 min)
-   - **NEW!** Code quality + security analysis
-   - Detects bugs, vulnerabilities, code smells
-   - Quality gate: Must pass to proceed
-   - View report: [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=Edoto03_taskmanager-devops)
-
-4. **Code Quality** (2 min)
-   - Checkstyle for code standards
-   - SpotBugs for bug detection
-
-5. **Build Application** (3 min)
-   - Compiles and packages JAR
-   - Uploads artifact for deployment
-
-6. **Build Docker Image** (4 min)
-   - Multi-stage Docker build
-   - Pushes to Docker Hub (on main branch)
-   - Tags: `latest`, `main-<sha>`
-
-7. **Security Scan** (2 min)
-   - Trivy scans for vulnerabilities
-   - Checks: OS packages + dependencies
-   - Severity: Critical & High
-   - Generates JSON report
-
-8. **Deployment Status** (1 min)
-   - Summary of all jobs
-   - Fails if critical jobs fail
-
-**Total Pipeline Time:** ~19 minutes
-
-View live: [GitHub Actions](https://github.com/Edoto03/taskmanager-devops/actions)
+| Category | Technology |
+|----------|-----------|
+| Core Framework | Java 21, Spring Boot 3.2.0 |
+| Data Persistence | Spring Data JPA, PostgreSQL 15, Flyway 9.22 |
+| CI/CD Automation | GitHub Actions |
+| Containerization | Docker, Docker Compose |
+| Orchestration | Kubernetes |
+| Security (SAST) | SonarQube, Trivy, Snyk, SpotBugs |
+| Quality Assurance | JUnit 5, Mockito, JaCoCo |
+| Build Tool | Maven 3.8 |
 
 ---
 
-## 🔒 Security & SAST
+## Future Improvements
 
-### Static Application Security Testing Tools
-
-#### 1. **SonarQube** (Code Quality + Security)
-- **What:** Continuous code quality inspection
-- **Scans:** 
-  - Security vulnerabilities (SQL injection, XSS, etc.)
-  - Bugs and code smells
-  - Code duplication
-  - Technical debt
-- **Integration:** Runs on every commit
-- **Dashboard:** [View SonarCloud](https://sonarcloud.io/dashboard?id=Edoto03_taskmanager-devops)
-
-**Example findings:**
-- Security hotspots: 0
-- Bugs: 0
-- Code smells: 3 (minor)
-- Coverage: 75%
-- Duplications: 0%
-
-#### 2. **Trivy** (Container Security)
-- **What:** Vulnerability scanner for containers
-- **Scans:** 
-  - OS packages (Alpine, Ubuntu, etc.)
-  - Application dependencies (Maven, npm)
-  - Known CVEs from NVD database
-- **Integration:** Scans every Docker image before deployment
-- **Format:** Table + JSON reports
-
-**Example output:**
-```
-Total: 12 (HIGH: 2, MEDIUM: 10, LOW: 0)
-┌────────────┬──────────────┬──────────┬─────────────┐
-│  Library   │ Vulnerability│ Severity │ Fixed Ver   │
-├────────────┼──────────────┼──────────┼─────────────┤
-│ spring-web │ CVE-2023-xxx │   HIGH   │ 6.0.12      │
-└────────────┴──────────────┴──────────┴─────────────┘
-```
-
-#### 3. **SpotBugs** (Java Static Analysis)
-- **What:** Analyzes Java bytecode for bugs
-- **Detects:** 
-  - Null pointer dereferences
-  - Resource leaks
-  - SQL injection risks
-  - Hardcoded credentials
-- **Integration:** Runs in Code Quality job
-
-#### 4. **Checkstyle** (Code Standards)
-- **What:** Enforces Google Java Style Guide
-- **Checks:** 
-  - Naming conventions
-  - Code formatting
-  - Import organization
-- **Purpose:** Consistency improves security reviews
-
-### Why SAST Matters
-
-1. **Early Detection** - Find vulnerabilities in development
-2. **Cost Savings** - 10x cheaper to fix early vs. production
-3. **Compliance** - Meets OWASP, PCI-DSS requirements
-4. **Quality** - Prevents technical debt
-
-**SAST vs DAST:**
-
-| Aspect | SAST (Our Project) | DAST |
-|--------|-------------------|------|
-| Method | Analyzes source code | Tests running app |
-| When | During development | After deployment |
-| Coverage | 100% of code | Exposed interfaces |
-| Speed | Fast (minutes) | Slow (hours) |
-
----
-
-## 📝 API Endpoints
-
-| Method | Endpoint | Description | Request Body |
-|--------|----------|-------------|--------------|
-| GET | `/api/tasks` | Get all tasks | - |
-| GET | `/api/tasks/{id}` | Get task by ID | - |
-| POST | `/api/tasks` | Create new task | `{title, description, status}` |
-| PUT | `/api/tasks/{id}` | Update task | `{title, description, status}` |
-| DELETE | `/api/tasks/{id}` | Delete task | - |
-
-### Example Requests
-```bash
-# Get all tasks
-curl http://localhost:30080/api/tasks
-
-# Create task
-curl -X POST http://localhost:30080/api/tasks \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Complete DevOps Project",
-    "description": "Finish all 10 topics",
-    "status": "IN_PROGRESS"
-  }'
-
-# Update task
-curl -X PUT http://localhost:30080/api/tasks/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Updated Title",
-    "description": "Updated description",
-    "status": "COMPLETED"
-  }'
-
-# Delete task
-curl -X DELETE http://localhost:30080/api/tasks/1
-```
-
----
-
-## 🗄️ Database
-
-### Schema
-```sql
-CREATE TABLE tasks (
-    id BIGSERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### Flyway Migrations
-
-**V1__Create_tasks_table.sql**
-- Creates tasks table
-- Adds indexes for performance
-- Status: ✅ Applied
-
-**V2__Insert_sample_data.sql**
-- Inserts 8 sample tasks
-- Different statuses (PENDING, IN_PROGRESS, COMPLETED)
-- Status: ✅ Applied
-
-Migrations run automatically on application startup.
-
----
-
-## ☸️ Kubernetes Deployment
-
-### Resources
-```yaml
-Namespace:    taskmanager
-Deployments:  postgres (1 replica), taskmanager (1 replica)
-Services:     postgres-service (ClusterIP), taskmanager-service (NodePort)
-ConfigMap:    taskmanager-config (app settings)
-Secret:       taskmanager-secret (DB credentials)
-PVC:          postgres-pvc (1Gi persistent storage)
-```
-
-### Key Features
-
-- **Auto-healing:** Pods restart on failure
-- **Rolling updates:** Zero-downtime deployments
-- **Resource limits:** CPU & memory constraints
-- **Health checks:** Liveness & readiness probes
-- **Init containers:** Wait for database before starting
-- **Persistent storage:** Database survives pod restarts
-
-### Commands
-```bash
-# View all resources
-kubectl get all -n taskmanager
-
-# Check logs
-kubectl logs -n taskmanager deployment/taskmanager -f
-
-# Scale application
-kubectl scale deployment taskmanager --replicas=3 -n taskmanager
-
-# Access database
-kubectl exec -it -n taskmanager deployment/postgres -- \
-  psql -U postgres -d taskmanager
-
-# Port forward (alternative access)
-kubectl port-forward -n taskmanager service/taskmanager-service 8080:8080
-```
-
----
-
-## 🧪 Testing
-
-### Test Coverage
-```
-Controller Layer:  7 tests  (85% coverage)
-Service Layer:     7 tests  (80% coverage)
-Repository Layer:  7 tests  (70% coverage)
-─────────────────────────────────────────
-Total:            21 tests  (75% coverage)
-```
-
-### Technologies
-
-- **JUnit 5** - Test framework
-- **Mockito** - Mocking dependencies
-- **MockMvc** - Testing REST endpoints
-- **AssertJ** - Fluent assertions
-- **H2** - In-memory test database
-
----
-
-## 📦 Technologies
-
-### Backend
-- Java 21
-- Spring Boot 3.2.0
-- Spring Data JPA
-- PostgreSQL 15
-- Flyway 9.22
-
-### DevOps
-- Git & GitHub
-- GitHub Actions
-- Docker & Docker Compose
-- Kubernetes
-- Maven 3.8
-
-### Quality & Security
-- JUnit 5 & Mockito
-- JaCoCo (Coverage)
-- **SonarQube (NEW!)**
-- Checkstyle
-- SpotBugs
-- Trivy
-
----
-
-## 🎯 Lessons Learned
-
-### What Went Well ✅
-- Automated testing caught bugs early
-- Docker simplified deployment
-- Kubernetes provided resilience
-- SonarQube improved code quality
-
-### Challenges Faced 🔧
-- Flyway migration naming conventions
-- Kubernetes persistent volume setup
-- GitHub Actions secret management
-- SonarCloud integration
-
-### Future Improvements 🚀
-- Add integration tests
-- Implement monitoring (Prometheus/Grafana)
-- Add log aggregation (ELK)
-- Implement blue-green deployment
-- Add Helm charts
-
----
-
-## 👨‍💻 Author
-
-- GitHub: [@Edoto03](https://github.com/Edoto03)
-- Project: [taskmanager-devops](https://github.com/Edoto03/taskmanager-devops)
-
----
-
-## 📄 License
-
-This project is created for educational purposes as part of a DevOps course final project.
-
----
-
-## 🙏 Acknowledgments
-
-- DevOps course instructors
-- Spring Boot documentation
-- Kubernetes documentation
-- SonarQube community
-- OWASP security guidelines
-
----
-
-**Last Updated:** January 2026
+- **Monitoring & Observability:** Implement Prometheus and Grafana for metrics collection and visualization.
+- **Log Aggregation:** Deploy ELK stack (Elasticsearch, Logstash, Kibana) for centralized logging.
+- **Advanced Deployment Strategies:** Implement blue-green deployments and canary releases for safer production updates.
