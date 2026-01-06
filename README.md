@@ -18,37 +18,39 @@ A lightweight task management REST API built with Spring Boot. The application p
 taskmanager-devops/
 ├── .github/
 │   └── workflows/
-│       ├── ci-cd.yml              # Main CI/CD pipeline
-│       └── sonar.yml              # SonarQube analysis
+│       ├── ci-cd.yml                      # Main CI/CD pipeline
+│       └── sonar.yml                      # SonarQube analysis workflow
+├── .mvn/wrapper/                          # Maven wrapper files
+│   └── maven-wrapper.properties
 ├── k8s/
-│   ├── namespace.yaml             # Kubernetes namespace
-│   ├── configmap.yaml             # Application configuration
-│   ├── secret.yaml                # Database credentials
-│   ├── postgres-deployment.yaml   # PostgreSQL deployment
-│   ├── postgres-pvc.yaml          # Persistent volume claim
-│   ├── postgres-service.yaml      # PostgreSQL service
-│   ├── deployment.yaml            # Application deployment
-│   ├── service.yaml               # Application service (NodePort)
-│   └── ingress.yaml               # Ingress configuration
+│   ├── namespace.yaml                     # Kubernetes namespace definition
+│   ├── configmap.yaml                     # Application configuration
+│   ├── postgres-deployment.yaml           # PostgreSQL deployment
+│   ├── postgres-pvc.yaml                  # Persistent volume claim (1Gi)
+│   ├── postgres-service.yaml              # PostgreSQL ClusterIP service
+│   ├── deployment.yaml                    # Application deployment
+│   ├── service.yaml                       # Application NodePort service
+│   └── ingress.yaml                       # Ingress configuration
 ├── src/
 │   ├── main/
 │   │   ├── java/com/university/taskmanager/
 │   │   │   ├── controller/
-│   │   │   │   └── TaskController.java
+│   │   │   │   └── TaskController.java    # REST API endpoints
 │   │   │   ├── model/
-│   │   │   │   └── Task.java
+│   │   │   │   └── Task.java              # JPA entity
 │   │   │   ├── repository/
-│   │   │   │   └── TaskRepository.java
+│   │   │   │   └── TaskRepository.java    # Data access layer
 │   │   │   ├── service/
-│   │   │   │   └── TaskService.java
-│   │   │   └── TaskmanagerApplication.java
+│   │   │   │   └── TaskService.java       # Business logic
+│   │   │   └── TaskmanagerApplication.java # Main application class
 │   │   └── resources/
-│   │       ├── application.properties
+│   │       ├── application.properties     # Spring Boot configuration
 │   │       ├── db/migration/
 │   │       │   ├── V1__Create_tasks_table.sql
 │   │       │   └── V2__Insert_sample_data.sql
-│   │       └── static/
-│   │           └── index.html
+│   │       ├── static/
+│   │       │   └── index.html             # Frontend interface
+│   │       └── templates/                 # (if any Thymeleaf templates)
 │   └── test/
 │       ├── java/com/university/taskmanager/
 │       │   ├── controller/
@@ -57,12 +59,18 @@ taskmanager-devops/
 │       │   │   └── TaskServiceTest.java
 │       │   └── TaskmanagerApplicationTests.java
 │       └── resources/
-│           └── application-test.properties
-├── Dockerfile
-├── docker-compose.yml
-├── pom.xml
-├── sonar-project.properties
-└── README.md
+│           └── application-test.properties # Test configuration
+├── .dockerignore                          # Docker build exclusions
+├── .gitattributes                         # Git attributes configuration
+├── .gitignore                             # Git ignore rules
+├── Dockerfile                             # Multi-stage container build
+├── HELP.md                                # Spring Boot help documentation
+├── README.md                              # Project documentation (this file)
+├── docker-compose.yml                     # Local development environment
+├── mvnw                                   # Maven wrapper script (Unix)
+├── mvnw.cmd                               # Maven wrapper script (Windows)
+├── pom.xml                                # Maven dependencies and plugins
+└── sonar-project.properties               # SonarQube configuration
 ```
 
 ---
@@ -101,10 +109,10 @@ The project follows a Structured GitFlow Strategy with protection rules to ensur
 
 **Workflow Diagram:**
 ```
-feature/add-api → develop → main → Kubernetes Production
-       ↓             ↓        ↓
-    Lint Check    Full CI   Deploy
-                  + Tests
+feature/add-api → Pull Request → main → Kubernetes Production
+       ↓                            ↓
+    Lint Check                Full CI Pipeline
+                              (Test + Build + Deploy)
 ```
 
 ---
@@ -141,7 +149,7 @@ View live pipeline: [GitHub Actions](https://github.com/Edoto03/taskmanager-devo
 
 **SonarQube**
 - **Purpose:** Code quality and security analysis
-- **Integration:** Runs on every commit
+- **Integration:** Runs on every commit via dedicated workflow
 - **Detects:** SQL injection, XSS vulnerabilities, code smells, technical debt
 - **Dashboard:** [SonarCloud](https://sonarcloud.io/dashboard?id=Edoto03_taskmanager-devops)
 
@@ -193,7 +201,6 @@ Namespace: taskmanager
 Deployments: postgres (1 replica), taskmanager (1 replica)
 Services: postgres-service (ClusterIP), taskmanager-service (NodePort:30080)
 ConfigMaps: taskmanager-config (environment variables)
-Secrets: taskmanager-secret (database credentials)
 Storage: postgres-pvc (1Gi persistent volume)
 ```
 
@@ -281,7 +288,7 @@ cd taskmanager-devops
 docker-compose up -d
 
 # Run application
-mvn spring-boot:run
+mvnw spring-boot:run
 
 # Access API
 curl http://localhost:8080/api/tasks
@@ -322,7 +329,7 @@ curl http://localhost:30080/api/tasks
 | Containerization | Docker, Docker Compose |
 | Orchestration | Kubernetes |
 | Security (SAST) | SonarQube, Trivy, Snyk, SpotBugs |
-| Quality Assurance | JUnit 5, Mockito, JaCoCo |
+| Quality Assurance | JUnit 5, Mockito, JaCoCo (75% coverage) |
 | Build Tool | Maven 3.8 |
 
 ---
@@ -330,5 +337,4 @@ curl http://localhost:30080/api/tasks
 ## Future Improvements
 
 - **Monitoring & Observability:** Implement Prometheus and Grafana for metrics collection and visualization.
-- **Log Aggregation:** Deploy ELK stack (Elasticsearch, Logstash, Kibana) for centralized logging.
-- **Advanced Deployment Strategies:** Implement blue-green deployments and canary releases for safer production updates.
+- **Log Aggregation:** Deploy ELK stack (Elasticsearch, Logstog, Kibana) for centralized logging.
